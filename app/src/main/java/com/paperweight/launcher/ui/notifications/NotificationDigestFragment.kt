@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.paperweight.launcher.data.model.NotificationTier
 import com.paperweight.launcher.databinding.FragmentNotificationDigestBinding
@@ -55,7 +57,8 @@ class NotificationDigestFragment : Fragment() {
     }
 
     private fun observeNotifications() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             PaperNotificationService.notifications.collect { notifications ->
                 val tier1 = notifications.filter { it.tier == NotificationTier.TIER_1 }
                 val tier2 = notifications.filter { it.tier == NotificationTier.TIER_2 }
@@ -71,6 +74,7 @@ class NotificationDigestFragment : Fragment() {
 
                 binding.emptyState.visibility =
                     if (notifications.isEmpty()) View.VISIBLE else View.GONE
+            }
             }
         }
     }

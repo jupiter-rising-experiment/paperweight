@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.paperweight.launcher.data.repository.AppRepository
 import com.paperweight.launcher.databinding.FragmentHomeBinding
@@ -83,7 +85,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeNotifications() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             PaperNotificationService.notifications.collect { notifications ->
                 val tier2Count = notifications.count {
                     it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_2
@@ -101,6 +104,7 @@ class HomeFragment : Fragment() {
                     else ->
                         "$tier2Count notification${if (tier2Count > 1) "s" else ""} · $tier3Count digest"
                 }
+            }
             }
         }
     }

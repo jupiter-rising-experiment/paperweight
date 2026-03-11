@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#000000</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#CCCCCC</color>
+    <color name="text_muted">#777777</color>
+    <color name="icon_frame_fill">#1A1A1A</color>
+    <color name="icon_frame_border">#333333</color>
+    <color name="notif_bg">#111111</color>
+    <color name="notif_border">#2A2A2A</color>
+</resources>
