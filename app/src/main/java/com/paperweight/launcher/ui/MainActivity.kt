@@ -3,6 +3,7 @@ package com.paperweight.launcher.ui
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -27,11 +28,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupViewPager()
-        onBackPressedDispatcher.addCallback(this) {
-            if (binding.viewPager.currentItem != HOME_PAGE_INDEX) {
-                binding.viewPager.setCurrentItem(HOME_PAGE_INDEX, true)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.viewPager.currentItem != HOME_PAGE_INDEX) {
+                    binding.viewPager.setCurrentItem(HOME_PAGE_INDEX, true)
+                }
             }
-        }
+        })
         checkNotificationPermission()
     }
 
@@ -52,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         val labels = listOf("Notifications", "Home", "Apps", "Library")
         binding.pageLabel.text = labels.getOrNull(position) ?: ""
     }
-
 
     private fun checkNotificationPermission() {
         val enabledListeners = Settings.Secure.getString(
