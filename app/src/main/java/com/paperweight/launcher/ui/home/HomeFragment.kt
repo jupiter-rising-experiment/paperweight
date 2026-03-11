@@ -16,6 +16,8 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 
 class HomeFragment : Fragment() {
 
@@ -83,28 +85,29 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeNotifications() {
-        lifecycleScope.launch {
-            PaperNotificationService.notifications.collect { notifications ->
-                val tier2Count = notifications.count {
-                    it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_2
-                }
-                val tier3Count = notifications.count {
-                    it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_3
-                }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                PaperNotificationService.notifications.collect { notifications ->
+                    val tier2Count = notifications.count {
+                        it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_2
+                    }
+                    val tier3Count = notifications.count {
+                        it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_3
+                    }
 
-                binding.notificationBadge.text = when {
-                    tier2Count == 0 && tier3Count == 0 -> ""
-                    tier2Count > 0 && tier3Count == 0 ->
-                        "$tier2Count notification${if (tier2Count > 1) "s" else ""}"
-                    tier2Count == 0 ->
-                        "$tier3Count digest item${if (tier3Count > 1) "s" else ""}"
-                    else ->
-                        "$tier2Count notification${if (tier2Count > 1) "s" else ""} · $tier3Count digest"
+                    binding.notificationBadge.text = when {
+                        tier2Count == 0 && tier3Count == 0 -> ""
+                        tier2Count > 0 && tier3Count == 0 ->
+                            "$tier2Count notification${if (tier2Count > 1) "s" else ""}"
+                        tier2Count == 0 ->
+                            "$tier3Count digest item${if (tier3Count > 1) "s" else ""}"
+                        else ->
+                            "$tier2Count notification${if (tier2Count > 1) "s" else ""} · $tier3Count digest"
+                    }
                 }
             }
         }
     }
-
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {

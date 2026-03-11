@@ -27,6 +27,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupViewPager()
+        onBackPressedDispatcher.addCallback(this) {
+            if (binding.viewPager.currentItem != HOME_PAGE_INDEX) {
+                binding.viewPager.setCurrentItem(HOME_PAGE_INDEX, true)
+            }
+        }
         checkNotificationPermission()
     }
 
@@ -48,11 +53,6 @@ class MainActivity : AppCompatActivity() {
         binding.pageLabel.text = labels.getOrNull(position) ?: ""
     }
 
-    override fun onBackPressed() {
-        if (binding.viewPager.currentItem != HOME_PAGE_INDEX) {
-            binding.viewPager.setCurrentItem(HOME_PAGE_INDEX, true)
-        }
-    }
 
     private fun checkNotificationPermission() {
         val enabledListeners = Settings.Secure.getString(
