@@ -1,5 +1,7 @@
 package com.paperweight.launcher.ui.appgrid
 
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -17,6 +19,7 @@ class AppGridAdapter(
 
         fun bind(app: AppInfo) {
             binding.appIcon.setImageDrawable(app.icon)
+            binding.appIcon.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
             binding.appLabel.text = app.label
             binding.root.setOnClickListener { onAppClick(app) }
         }

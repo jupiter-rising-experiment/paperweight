@@ -5,8 +5,8 @@
     <color name="text_secondary">#333333</color>
     <color name="text_muted">#888888</color>
 
-    <color name="icon_frame_fill">#F5F5F5</color>
-    <color name="icon_frame_border">#DDDDDD</color>
+    <color name="icon_frame_fill">#FFFFFF</color>
+    <color name="icon_frame_border">#C8C8C8</color>
 
     <color name="notif_bg">#FAFAFA</color>
     <color name="notif_border">#E8E8E8</color>
