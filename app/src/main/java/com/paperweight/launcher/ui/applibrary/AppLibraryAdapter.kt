@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.paperweight.launcher.data.model.AppInfo
 import com.paperweight.launcher.databinding.ItemAppListRowBinding
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 
 class AppLibraryAdapter(
     private val onAppClick: (AppInfo) -> Unit
@@ -17,6 +19,8 @@ class AppLibraryAdapter(
 
         fun bind(app: AppInfo) {
             binding.appIcon.setImageDrawable(app.icon)
+            val matrix = ColorMatrix().apply { setSaturation(0f) }
+            binding.appIcon.colorFilter = ColorMatrixColorFilter(matrix)
             binding.appLabel.text = app.label
             binding.root.setOnClickListener { onAppClick(app) }
         }
