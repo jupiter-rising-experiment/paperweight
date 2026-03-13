@@ -28,6 +28,9 @@ interface CoreAppDao {
 
     @Query("DELETE FROM core_app_settings WHERE packageName = :pkg")
     suspend fun deleteByPackage(pkg: String)
+
+    @Query("DELETE FROM core_app_settings")
+    suspend fun deleteAll()
 }
 
 @Database(

@@ -70,25 +70,36 @@ class AppRepository(private val context: Context) {
     }
 
     suspend fun seedDefaultsIfEmpty() = withContext(Dispatchers.IO) {
-        val existing = coreAppDao.getAll()
-        if (existing.isNotEmpty()) return@withContext
+        val prefs = context.getSharedPreferences("paperweight_prefs", Context.MODE_PRIVATE)
+        val seededVersion = prefs.getInt("core_apps_defaults_version", 0)
+        val currentVersion = 2
 
-        val defaults = listOf(
-            "com.android.dialer",
-            "com.android.mms",
-            "com.google.android.apps.messaging"
+        if (seededVersion >= currentVersion && coreAppDao.getAll().isNotEmpty()) return@withContext
+
+        // Role-based defaults: first installed package per role wins
+        val roleDefaults = listOf(
+            listOf("com.google.android.apps.messaging", "com.android.mms"),   // Messages
+            listOf("com.google.android.dialer", "com.android.dialer"),         // Phone
+            listOf("com.google.android.gm", "com.android.email"),              // Email
+            listOf("com.android.chrome", "org.chromium.chrome")                // Chrome
         )
 
         val pm = context.packageManager
+        coreAppDao.deleteAll()
         var position = 0
-        for (pkg in defaults) {
-            try {
-                pm.getPackageInfo(pkg, 0)
-                coreAppDao.upsert(CoreAppSettings(pkg, position++))
-            } catch (e: PackageManager.NameNotFoundException) {
-                // Not installed, skip
+        for (candidates in roleDefaults) {
+            for (pkg in candidates) {
+                try {
+                    pm.getPackageInfo(pkg, 0)
+                    coreAppDao.upsert(CoreAppSettings(pkg, position++))
+                    break
+                } catch (e: PackageManager.NameNotFoundException) {
+                    // try next candidate
+                }
             }
         }
+
+        prefs.edit().putInt("core_apps_defaults_version", currentVersion).apply()
     }
 
     fun launchApp(packageName: String) {
