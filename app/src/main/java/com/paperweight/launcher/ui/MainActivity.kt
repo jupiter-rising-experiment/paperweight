@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updatePageIndicator(position: Int) {
-        val labels = listOf("Notifications", "Home", "Apps", "Library")
+        val labels = listOf("Activity", "Home", "Apps", "Library")
         binding.pageLabel.text = labels.getOrNull(position) ?: ""
     }
 

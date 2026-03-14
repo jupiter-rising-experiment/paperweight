@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Notifications"
+            android:text="Activity"
             android:textSize="20sp"
             android:textColor="@color/text_primary"
             android:paddingBottom="16dp" />
@@ -40,7 +40,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="URGENT"
+                android:text="IMPORTANT"
                 android:textSize="11sp"
                 android:textColor="@color/text_muted"
                 android:letterSpacing="0.1"
@@ -65,7 +65,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="NOTIFICATIONS"
+                android:text="UPDATES"
                 android:textSize="11sp"
                 android:textColor="@color/text_muted"
                 android:letterSpacing="0.1"
@@ -90,7 +90,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="DIGEST"
+                android:text="MORE"
                 android:textSize="11sp"
                 android:textColor="@color/text_muted"
                 android:letterSpacing="0.1"

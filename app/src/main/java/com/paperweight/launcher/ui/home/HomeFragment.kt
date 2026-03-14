@@ -94,14 +94,10 @@ class HomeFragment : Fragment() {
                 val tier2Count = notifications.count {
                     it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_2
                 }
-                val tier3Count = notifications.count {
-                    it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_3
-                }
 
                 val parts = mutableListOf<String>()
-                if (tier1Count > 0) parts.add("$tier1Count alert${if (tier1Count > 1) "s" else ""}")
-                if (tier2Count > 0) parts.add("$tier2Count notification${if (tier2Count > 1) "s" else ""}")
-                if (tier3Count > 0) parts.add("$tier3Count digest")
+                if (tier1Count > 0) parts.add("$tier1Count important")
+                if (tier2Count > 0) parts.add("$tier2Count update${if (tier2Count > 1) "s" else ""}")
 
                 binding.notificationBadge.text = parts.joinToString(" · ")
             }
