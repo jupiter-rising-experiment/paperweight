@@ -33,6 +33,8 @@ class NotificationDigestFragment : Fragment() {
 
         setupTierRecyclers()
         observeNotifications()
+        PaperNotificationService.seedDummyData()
+
     }
 
     private fun setupTierRecyclers() {

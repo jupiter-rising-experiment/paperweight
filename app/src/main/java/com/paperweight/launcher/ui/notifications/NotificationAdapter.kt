@@ -23,6 +23,14 @@ class NotificationAdapter : ListAdapter<PaperNotification, NotificationAdapter.V
 
             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
             binding.notifTime.text = timeFormat.format(Date(notification.timestamp))
+
+            try {
+                val icon = binding.root.context.packageManager
+                    .getApplicationIcon(notification.packageName)
+                binding.notifIcon.setImageDrawable(icon)
+            } catch (e: android.content.pm.PackageManager.NameNotFoundException) {
+                binding.notifIcon.setImageDrawable(null)
+            }
         }
     }
 
