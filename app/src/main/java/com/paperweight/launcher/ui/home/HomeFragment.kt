@@ -88,6 +88,9 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             PaperNotificationService.notifications.collect { notifications ->
+                val tier1Count = notifications.count {
+                    it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_1
+                }
                 val tier2Count = notifications.count {
                     it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_2
                 }
@@ -95,15 +98,12 @@ class HomeFragment : Fragment() {
                     it.tier == com.paperweight.launcher.data.model.NotificationTier.TIER_3
                 }
 
-                binding.notificationBadge.text = when {
-                    tier2Count == 0 && tier3Count == 0 -> ""
-                    tier2Count > 0 && tier3Count == 0 ->
-                        "$tier2Count notification${if (tier2Count > 1) "s" else ""}"
-                    tier2Count == 0 ->
-                        "$tier3Count digest item${if (tier3Count > 1) "s" else ""}"
-                    else ->
-                        "$tier2Count notification${if (tier2Count > 1) "s" else ""} · $tier3Count digest"
-                }
+                val parts = mutableListOf<String>()
+                if (tier1Count > 0) parts.add("$tier1Count alert${if (tier1Count > 1) "s" else ""}")
+                if (tier2Count > 0) parts.add("$tier2Count notification${if (tier2Count > 1) "s" else ""}")
+                if (tier3Count > 0) parts.add("$tier3Count digest")
+
+                binding.notificationBadge.text = parts.joinToString(" · ")
             }
             }
         }
