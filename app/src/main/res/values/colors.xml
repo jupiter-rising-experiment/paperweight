@@ -11,6 +11,10 @@
     <color name="notif_bg">#FAFAFA</color>
     <color name="notif_border">#E8E8E8</color>
 
+    <color name="divider">#E0E0E0</color>
+    <color name="section_header">#555555</color>
+    <color name="notif_body">#444444</color>
+
     <color name="background_dark">#000000</color>
     <color name="text_primary_dark">#FFFFFF</color>
     <color name="text_secondary_dark">#CCCCCC</color>

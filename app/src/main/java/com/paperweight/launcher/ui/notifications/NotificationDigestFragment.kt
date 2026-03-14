@@ -16,6 +16,7 @@ class NotificationDigestFragment : Fragment() {
 
     private var _binding: FragmentNotificationDigestBinding? = null
     private val binding get() = _binding!!
+    private var isTier3Expanded = false
 
     private lateinit var tier1Adapter: NotificationAdapter
     private lateinit var tier2Adapter: NotificationAdapter
@@ -62,6 +63,20 @@ class NotificationDigestFragment : Fragment() {
                 val tier1 = notifications.filter { it.tier == NotificationTier.TIER_1 }
                 val tier2 = notifications.filter { it.tier == NotificationTier.TIER_2 }
                 val tier3 = notifications.filter { it.tier == NotificationTier.TIER_3 }
+                tier3Adapter.submitList(tier3)
+
+                if (tier3.isNotEmpty()) {
+                    binding.tier3Section.visibility = View.VISIBLE
+                    binding.tier3Header.text = "More (${tier3.size})"
+                    binding.tier3Header.setOnClickListener {
+                        isTier3Expanded = !isTier3Expanded
+                        binding.tier3Recycler.visibility =
+                            if (isTier3Expanded) View.VISIBLE else View.GONE
+                    }
+                } else {
+                    binding.tier3Section.visibility = View.GONE
+                }
+
 
                 tier1Adapter.submitList(tier1)
                 tier2Adapter.submitList(tier2)
@@ -81,4 +96,5 @@ class NotificationDigestFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

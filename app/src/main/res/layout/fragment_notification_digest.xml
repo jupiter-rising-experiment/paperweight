@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="24dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -40,11 +40,12 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="IMPORTANT"
-                android:textSize="11sp"
-                android:textColor="@color/text_muted"
-                android:letterSpacing="0.1"
-                android:paddingBottom="8dp" />
+                android:text="Important"
+                android:textSize="14sp"
+                android:textColor="@color/section_header"
+                android:letterSpacing="0.05"
+                android:paddingTop="24dp"
+                android:paddingBottom="16dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/tier1Recycler"
@@ -59,17 +60,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="16dp"
             android:visibility="gone">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="UPDATES"
-                android:textSize="11sp"
-                android:textColor="@color/text_muted"
-                android:letterSpacing="0.1"
-                android:paddingBottom="8dp" />
+                android:text="Updates"
+                android:textSize="14sp"
+                android:textColor="@color/section_header"
+                android:letterSpacing="0.05"
+                android:paddingTop="24dp"
+                android:paddingBottom="16dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/tier2Recycler"
@@ -84,23 +85,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="16dp"
             android:visibility="gone">
 
             <TextView
+                android:id="@+id/tier3Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="MORE"
-                android:textSize="11sp"
-                android:textColor="@color/text_muted"
-                android:letterSpacing="0.1"
-                android:paddingBottom="8dp" />
+                android:text="More"
+                android:textSize="14sp"
+                android:textColor="@color/section_header"
+                android:letterSpacing="0.05"
+                android:paddingTop="24dp"
+                android:paddingBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/tier3Recycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

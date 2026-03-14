@@ -8,4 +8,8 @@
     <color name="icon_frame_border">#333333</color>
     <color name="notif_bg">#111111</color>
     <color name="notif_border">#2A2A2A</color>
+
+    <color name="divider">#2E2E2E</color>
+    <color name="section_header">#AAAAAA</color>
+    <color name="notif_body">#BBBBBB</color>
 </resources>

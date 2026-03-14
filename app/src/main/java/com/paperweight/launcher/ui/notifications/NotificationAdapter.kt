@@ -13,6 +13,7 @@ import com.paperweight.launcher.databinding.ItemNotificationBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.content.ContextCompat
 
 class NotificationAdapter : ListAdapter<PaperNotification, NotificationAdapter.ViewHolder>(DiffCallback()) {
 
@@ -33,7 +34,11 @@ class NotificationAdapter : ListAdapter<PaperNotification, NotificationAdapter.V
                     .getApplicationIcon(notification.packageName)
                 binding.notifIcon.setImageDrawable(icon)
             } catch (e: PackageManager.NameNotFoundException) {
-                binding.notifIcon.setImageDrawable(null)
+                val fallback = if (notification.packageName.contains("dialer") ||
+                    notification.packageName.contains("phone")) {
+                    ContextCompat.getDrawable(binding.root.context, android.R.drawable.ic_menu_call)
+                } else null
+                binding.notifIcon.setImageDrawable(fallback)
             }
             binding.notifIcon.colorFilter = grayscale
         }
