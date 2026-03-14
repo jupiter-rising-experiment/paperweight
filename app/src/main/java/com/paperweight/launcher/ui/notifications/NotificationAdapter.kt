@@ -1,5 +1,8 @@
 package com.paperweight.launcher.ui.notifications
 
+import android.content.pm.PackageManager
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -24,13 +27,15 @@ class NotificationAdapter : ListAdapter<PaperNotification, NotificationAdapter.V
             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
             binding.notifTime.text = timeFormat.format(Date(notification.timestamp))
 
+            val grayscale = ColorMatrixColorFilter(ColorMatrix().also { it.setSaturation(0f) })
             try {
                 val icon = binding.root.context.packageManager
                     .getApplicationIcon(notification.packageName)
                 binding.notifIcon.setImageDrawable(icon)
-            } catch (e: android.content.pm.PackageManager.NameNotFoundException) {
+            } catch (e: PackageManager.NameNotFoundException) {
                 binding.notifIcon.setImageDrawable(null)
             }
+            binding.notifIcon.colorFilter = grayscale
         }
     }
 

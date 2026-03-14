@@ -99,9 +99,9 @@ class HomeFragment : Fragment() {
                     }
 
                     val parts = mutableListOf<String>()
-                    if (tier1Count > 0) parts.add("$tier1Count alert${if (tier1Count > 1) "s" else ""}")
-                    if (tier2Count > 0) parts.add("$tier2Count notification${if (tier2Count > 1) "s" else ""}")
-                    if (tier3Count > 0) parts.add("$tier3Count digest")
+                    if (tier1Count > 0) parts.add("$tier1Count Important${if (tier1Count > 1) "s" else ""}")
+                    if (tier2Count > 0) parts.add("$tier2Count Updates${if (tier2Count > 1) "s" else ""}")
+
 
                     binding.notificationBadge.text = parts.joinToString(" · ")
                 }
