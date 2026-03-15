@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/moreLabel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="36dp"
+    android:paddingBottom="24dp"
+    android:text="More →"
+    android:textSize="15sp"
+    android:textColor="@color/text_muted"
+    android:gravity="center"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?attr/selectableItemBackground" />

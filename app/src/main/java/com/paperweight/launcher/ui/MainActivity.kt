@@ -13,10 +13,15 @@ import com.paperweight.launcher.ui.appgrid.AppGridFragment
 import com.paperweight.launcher.ui.applibrary.AppLibraryFragment
 import com.paperweight.launcher.ui.home.HomeFragment
 import com.paperweight.launcher.ui.notifications.NotificationDigestFragment
+import com.paperweight.launcher.ui.minimalistgrid.MinimalistAppGridFragment
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    fun navigateTo(position: Int) {
+        binding.viewPager.setCurrentItem(position, true)
+    }
 
     companion object {
         const val HOME_PAGE_INDEX = 1
@@ -52,7 +57,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updatePageIndicator(position: Int) {
-        val labels = listOf("Notifications", "Home", "Apps", "Library")
+        val labels = listOf("Notifications", "Home","Focus", "Apps", "Library")
+
         binding.pageLabel.text = labels.getOrNull(position) ?: ""
     }
 
@@ -71,13 +77,14 @@ class MainActivity : AppCompatActivity() {
     inner class LauncherPagerAdapter(activity: AppCompatActivity) :
         FragmentStateAdapter(activity) {
 
-        override fun getItemCount() = 4
+        override fun getItemCount() = 5
 
         override fun createFragment(position: Int): Fragment = when (position) {
             0 -> NotificationDigestFragment()
             1 -> HomeFragment()
-            2 -> AppGridFragment()
-            3 -> AppLibraryFragment()
+            2 -> MinimalistAppGridFragment()
+            3 -> AppGridFragment()
+            4 -> AppLibraryFragment()
             else -> HomeFragment()
         }
     }
