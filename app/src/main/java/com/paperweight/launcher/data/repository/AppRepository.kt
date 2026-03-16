@@ -3,35 +3,49 @@ package com.paperweight.launcher.data.repository
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import com.paperweight.launcher.data.db.CoreAppSettings
 import com.paperweight.launcher.data.db.PaperweightDatabase
 import com.paperweight.launcher.data.model.AppInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.paperweight.launcher.R
+
 
 class AppRepository(private val context: Context) {
 
     private val db = PaperweightDatabase.getInstance(context)
     private val coreAppDao = db.coreAppDao()
 
+    private val CUSTOM_ICONS = mapOf(
+        "com.google.android.dialer"         to R.drawable.ic_custom_phone,
+        "com.android.dialer"                to R.drawable.ic_custom_phone,
+        "com.google.android.gm"             to R.drawable.ic_custom_gmail,
+        "com.android.chrome"                to R.drawable.ic_custom_chrome,
+        "org.chromium.chrome"               to R.drawable.ic_custom_chrome,
+        "com.google.android.apps.messaging" to R.drawable.ic_custom_messages,
+        "com.android.mms"                   to R.drawable.ic_custom_messages,
+    )
+
     suspend fun getAllApps(): List<AppInfo> = withContext(Dispatchers.IO) {
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
-            val icon = CUSTOM_ICONS[packageName]
-                ?.let { ContextCompat.getDrawable(context, it) }
-                ?: pm.getApplicationIcon(packageName)
         }
 
         val corePackages = coreAppDao.getAll().map { it.packageName }.toSet()
 
         pm.queryIntentActivities(intent, PackageManager.GET_META_DATA)
             .map { resolveInfo ->
+                val pkg = resolveInfo.activityInfo.packageName
+                val icon = CUSTOM_ICONS[pkg]
+                    ?.let { ContextCompat.getDrawable(context, it) }
+                    ?: resolveInfo.loadIcon(pm)
                 AppInfo(
-                    packageName = resolveInfo.activityInfo.packageName,
+                    packageName = pkg,
                     label = resolveInfo.loadLabel(pm).toString(),
-                    icon = resolveInfo.loadIcon(pm),
-                    isCoreApp = resolveInfo.activityInfo.packageName in corePackages
+                    icon = icon,
+                    isCoreApp = pkg in corePackages
                 )
             }
             .sortedBy { it.label.lowercase() }
@@ -47,7 +61,9 @@ class AppRepository(private val context: Context) {
                 AppInfo(
                     packageName = setting.packageName,
                     label = pm.getApplicationLabel(appInfo).toString(),
-                    icon = pm.getApplicationIcon(setting.packageName),
+                    icon = CUSTOM_ICONS[setting.packageName]
+                        ?.let { ContextCompat.getDrawable(context, it) }
+                        ?: pm.getApplicationIcon(setting.packageName),
                     isCoreApp = true
                 )
             } catch (e: PackageManager.NameNotFoundException) {
@@ -79,12 +95,11 @@ class AppRepository(private val context: Context) {
 
         if (seededVersion >= currentVersion && coreAppDao.getAll().isNotEmpty()) return@withContext
 
-        // Role-based defaults: first installed package per role wins
         val roleDefaults = listOf(
-            listOf("com.google.android.apps.messaging", "com.android.mms"),   // Messages
-            listOf("com.google.android.dialer", "com.android.dialer"),         // Phone
-            listOf("com.google.android.gm", "com.android.email"),              // Email
-            listOf("com.android.chrome", "org.chromium.chrome")                // Chrome
+            listOf("com.google.android.apps.messaging", "com.android.mms"),
+            listOf("com.google.android.dialer", "com.android.dialer"),
+            listOf("com.google.android.gm", "com.android.email"),
+            listOf("com.android.chrome", "org.chromium.chrome")
         )
 
         val pm = context.packageManager
@@ -111,14 +126,4 @@ class AppRepository(private val context: Context) {
             context.startActivity(intent)
         }
     }
-    private val CUSTOM_ICONS = mapOf(
-        "com.google.android.dialer"          to R.drawable.ic_custom_phone,
-        "com.android.dialer"                 to R.drawable.ic_custom_phone,
-        "com.google.android.gm"              to R.drawable.ic_custom_gmail,
-        "com.android.chrome"                 to R.drawable.ic_custom_chrome,
-        "org.chromium.chrome"                to R.drawable.ic_custom_chrome,
-        "com.google.android.apps.messaging"  to R.drawable.ic_custom_messages,
-        "com.android.mms"                    to R.drawable.ic_custom_messages,
-    )
-
 }
