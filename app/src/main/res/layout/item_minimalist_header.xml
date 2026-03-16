@@ -4,9 +4,10 @@
     android:id="@+id/categoryLabel"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="28dp"
-    android:paddingBottom="10dp"
-    android:textSize="11sp"
-    android:textColor="@color/text_muted"
-    android:letterSpacing="0.1"
-    android:textAllCaps="true" />
+    android:paddingStart="24dp"
+    android:paddingTop="32dp"
+    android:paddingBottom="12dp"
+    android:textSize="14sp"
+    android:fontFamily="sans-serif-medium"
+    android:textColor="#555555"
+    android:letterSpacing="0.08" />

@@ -1,6 +1,5 @@
 package com.paperweight.launcher.ui.minimalistgrid
 
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +15,40 @@ import com.paperweight.launcher.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private data class FocusCategory(val name: String, val packages: List<String>)
+
+private val FOCUS_CATEGORIES = listOf(
+    FocusCategory("Communication", listOf(
+        "com.google.android.apps.messaging",
+        "com.android.mms",
+        "com.whatsapp",
+        "org.thoughtcrime.securesms",
+        "com.facebook.orca",
+    )),
+    FocusCategory("Entertainment", listOf(
+        "com.google.android.apps.youtube.music",
+        "com.google.android.youtube",
+        "com.google.android.apps.photos",
+        "com.spotify.music",
+        "com.netflix.mediaclient",
+    )),
+    FocusCategory("Tools", listOf(
+        "com.google.android.apps.maps",
+        "com.android.chrome",
+        "org.chromium.chrome",
+        "com.google.android.calculator",
+        "com.google.android.deskclock",
+    )),
+    FocusCategory("Work", listOf(
+        "com.google.android.calendar",
+        "com.google.android.apps.docs",
+        "com.google.android.gm",
+        "com.microsoft.teams",
+        "com.slack",
+        "com.notion.id",
+    ))
+)
 
 class MinimalistAppGridFragment : Fragment() {
 
@@ -63,41 +96,35 @@ class MinimalistAppGridFragment : Fragment() {
     }
 
     private suspend fun buildItemList(): List<MinimalistItem> = withContext(Dispatchers.IO) {
-        val apps = appRepository.getAllApps()
         val pm = requireContext().packageManager
-        val categorised = mutableMapOf<String, MutableList<AppInfo>>()
-
-        for (app in apps) {
-            val cat = resolveCategory(pm, app.packageName) ?: continue
-            categorised.getOrPut(cat) { mutableListOf() }.add(app)
-        }
-
         val result = mutableListOf<MinimalistItem>()
-        for ((category, appsInCat) in categorised.toSortedMap()) {
-            result.add(MinimalistItem.Header(category))
-            appsInCat.sortedBy { it.label.lowercase() }.forEach { result.add(MinimalistItem.App(it)) }
-        }
-        if (result.isNotEmpty()) result.add(MinimalistItem.More)
-        result
-    }
+        var isFirst = true
 
-    private fun resolveCategory(pm: PackageManager, packageName: String): String? {
-        val category = try {
-            pm.getApplicationInfo(packageName, 0).category
-        } catch (e: PackageManager.NameNotFoundException) {
-            return null
+        for (category in FOCUS_CATEGORIES) {
+            val installedApps = category.packages.mapNotNull { pkg ->
+                try {
+                    val appInfo = pm.getApplicationInfo(pkg, 0)
+                    AppInfo(
+                        packageName = pkg,
+                        label = pm.getApplicationLabel(appInfo).toString(),
+                        icon = pm.getApplicationIcon(pkg),
+                        isCoreApp = false
+                    )
+                } catch (e: PackageManager.NameNotFoundException) {
+                    null
+                }
+            }
+
+            if (installedApps.isEmpty()) continue
+
+            if (!isFirst) result.add(MinimalistItem.Separator)
+            result.add(MinimalistItem.Header(category.name))
+            installedApps.forEach { result.add(MinimalistItem.App(it)) }
+            isFirst = false
         }
-        return when (category) {
-            ApplicationInfo.CATEGORY_SOCIAL        -> "Communication"
-            ApplicationInfo.CATEGORY_MAPS          -> "Navigation"
-            ApplicationInfo.CATEGORY_AUDIO         -> "Audio"
-            ApplicationInfo.CATEGORY_VIDEO         -> "Video"
-            ApplicationInfo.CATEGORY_IMAGE         -> "Photos"
-            ApplicationInfo.CATEGORY_GAME          -> "Games"
-            ApplicationInfo.CATEGORY_NEWS          -> "News"
-            ApplicationInfo.CATEGORY_PRODUCTIVITY  -> "Productivity"
-            else                                   -> null
-        }
+
+        if (result.isNotEmpty()) result.add(MinimalistItem.MoreApps)
+        result
     }
 
     override fun onResume() {

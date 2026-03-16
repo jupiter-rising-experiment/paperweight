@@ -16,6 +16,7 @@
             android:layout_height="wrap_content"
             android:text="Activity"
             android:textSize="20sp"
+            android:fontFamily="@font/libre_baskerville"
             android:textColor="@color/text_primary"
             android:paddingBottom="16dp" />
 

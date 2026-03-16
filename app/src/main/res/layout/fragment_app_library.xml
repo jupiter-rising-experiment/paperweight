@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:text="Library"
         android:textSize="20sp"
+        android:fontFamily="@font/libre_baskerville"
         android:textColor="@color/text_primary"
         android:paddingHorizontal="20dp"
         android:paddingTop="20dp"

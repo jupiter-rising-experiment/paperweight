@@ -7,11 +7,13 @@ import com.paperweight.launcher.data.model.AppInfo
 import com.paperweight.launcher.databinding.ItemMinimalistAppBinding
 import com.paperweight.launcher.databinding.ItemMinimalistHeaderBinding
 import com.paperweight.launcher.databinding.ItemMinimalistMoreBinding
+import com.paperweight.launcher.databinding.ItemMinimalistSeparatorBinding
 
 sealed class MinimalistItem {
     data class Header(val categoryName: String) : MinimalistItem()
+    object Separator : MinimalistItem()
     data class App(val appInfo: AppInfo) : MinimalistItem()
-    object More : MinimalistItem()
+    object MoreApps : MinimalistItem()
 }
 
 class MinimalistAppAdapter(
@@ -20,9 +22,10 @@ class MinimalistAppAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        const val VIEW_TYPE_HEADER = 0
-        const val VIEW_TYPE_APP = 1
-        const val VIEW_TYPE_MORE = 2
+        const val VIEW_TYPE_HEADER    = 0
+        const val VIEW_TYPE_SEPARATOR = 1
+        const val VIEW_TYPE_APP       = 2
+        const val VIEW_TYPE_MORE      = 3
     }
 
     private var items: List<MinimalistItem> = emptyList()
@@ -35,26 +38,30 @@ class MinimalistAppAdapter(
     override fun getItemCount() = items.size
 
     override fun getItemViewType(position: Int) = when (items[position]) {
-        is MinimalistItem.Header -> VIEW_TYPE_HEADER
-        is MinimalistItem.App    -> VIEW_TYPE_APP
-        is MinimalistItem.More   -> VIEW_TYPE_MORE
+        is MinimalistItem.Header    -> VIEW_TYPE_HEADER
+        is MinimalistItem.Separator -> VIEW_TYPE_SEPARATOR
+        is MinimalistItem.App       -> VIEW_TYPE_APP
+        is MinimalistItem.MoreApps  -> VIEW_TYPE_MORE
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            VIEW_TYPE_HEADER -> HeaderHolder(ItemMinimalistHeaderBinding.inflate(inflater, parent, false))
-            VIEW_TYPE_APP    -> AppHolder(ItemMinimalistAppBinding.inflate(inflater, parent, false))
-            else             -> MoreHolder(ItemMinimalistMoreBinding.inflate(inflater, parent, false))
+            VIEW_TYPE_HEADER    -> HeaderHolder(ItemMinimalistHeaderBinding.inflate(inflater, parent, false))
+            VIEW_TYPE_SEPARATOR -> SeparatorHolder(ItemMinimalistSeparatorBinding.inflate(inflater, parent, false))
+            VIEW_TYPE_APP       -> AppHolder(ItemMinimalistAppBinding.inflate(inflater, parent, false))
+            else                -> MoreHolder(ItemMinimalistMoreBinding.inflate(inflater, parent, false))
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
-            is MinimalistItem.Header -> (holder as HeaderHolder).bind(item)
-            is MinimalistItem.App    -> (holder as AppHolder).bind(item)
-            is MinimalistItem.More   -> (holder as MoreHolder).bind()
+            is MinimalistItem.Header   -> (holder as HeaderHolder).bind(item)
+            is MinimalistItem.App      -> (holder as AppHolder).bind(item)
+            is MinimalistItem.Separator,
+            is MinimalistItem.MoreApps -> { /* static views */ }
         }
+        if (holder is MoreHolder) holder.bind()
     }
 
     inner class HeaderHolder(private val binding: ItemMinimalistHeaderBinding) :
@@ -63,6 +70,9 @@ class MinimalistAppAdapter(
             binding.categoryLabel.text = item.categoryName
         }
     }
+
+    inner class SeparatorHolder(binding: ItemMinimalistSeparatorBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     inner class AppHolder(private val binding: ItemMinimalistAppBinding) :
         RecyclerView.ViewHolder(binding.root) {
