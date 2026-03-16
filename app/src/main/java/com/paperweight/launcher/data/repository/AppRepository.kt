@@ -18,6 +18,9 @@ class AppRepository(private val context: Context) {
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
+            val icon = CUSTOM_ICONS[packageName]
+                ?.let { ContextCompat.getDrawable(context, it) }
+                ?: pm.getApplicationIcon(packageName)
         }
 
         val corePackages = coreAppDao.getAll().map { it.packageName }.toSet()
@@ -108,4 +111,14 @@ class AppRepository(private val context: Context) {
             context.startActivity(intent)
         }
     }
+    private val CUSTOM_ICONS = mapOf(
+        "com.google.android.dialer"          to R.drawable.ic_custom_phone,
+        "com.android.dialer"                 to R.drawable.ic_custom_phone,
+        "com.google.android.gm"              to R.drawable.ic_custom_gmail,
+        "com.android.chrome"                 to R.drawable.ic_custom_chrome,
+        "org.chromium.chrome"                to R.drawable.ic_custom_chrome,
+        "com.google.android.apps.messaging"  to R.drawable.ic_custom_messages,
+        "com.android.mms"                    to R.drawable.ic_custom_messages,
+    )
+
 }

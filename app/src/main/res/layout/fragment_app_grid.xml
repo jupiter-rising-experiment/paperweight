@@ -12,7 +12,9 @@
         android:text="Apps"
         android:textSize="20sp"
         android:textColor="@color/text_primary"
-        android:padding="20dp" />
+        android:padding="20dp">
+
+    </TextView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/appGridRecycler"
