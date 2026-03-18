@@ -8,52 +8,142 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.paperweight.launcher.R
+import com.paperweight.launcher.data.model.NotificationItem
 import com.paperweight.launcher.data.model.PaperNotification
 import com.paperweight.launcher.databinding.ItemNotificationBinding
+import com.paperweight.launcher.databinding.ItemNotificationGroupBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class NotificationAdapter : ListAdapter<PaperNotification, NotificationAdapter.ViewHolder>(DiffCallback()) {
+class NotificationAdapter(
+    private val onGroupToggle: (String) -> Unit
+) : ListAdapter<NotificationItem, RecyclerView.ViewHolder>(DiffCallback()) {
 
-    inner class ViewHolder(private val binding: ItemNotificationBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    companion object {
+        private const val VIEW_SINGLE = 0
+        private const val VIEW_GROUP = 1
+    }
 
-        fun bind(notification: PaperNotification) {
-            binding.notifApp.text = notification.appLabel
-            binding.notifTitle.text = notification.title
-            binding.notifText.text = notification.text
+    override fun getItemViewType(position: Int) = when (getItem(position)) {
+        is NotificationItem.Single, is NotificationItem.GroupChild -> VIEW_SINGLE
+        is NotificationItem.GroupHeader -> VIEW_GROUP
+    }
 
-            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-            binding.notifTime.text = timeFormat.format(Date(notification.timestamp))
+    inner class SingleViewHolder(val binding: ItemNotificationBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
-            val grayscale = ColorMatrixColorFilter(ColorMatrix().also { it.setSaturation(0f) })
-            try {
-                val icon = binding.root.context.packageManager
-                    .getApplicationIcon(notification.packageName)
-                binding.notifIcon.setImageDrawable(icon)
-            } catch (e: PackageManager.NameNotFoundException) {
-                binding.notifIcon.setImageDrawable(null)
-            }
-            binding.notifIcon.colorFilter = grayscale
+    inner class GroupViewHolder(val binding: ItemNotificationGroupBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_GROUP -> GroupViewHolder(
+                ItemNotificationGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            else -> SingleViewHolder(
+                ItemNotificationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemNotificationBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
-        )
-        return ViewHolder(binding)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = getItem(position)) {
+            is NotificationItem.Single -> bindSingle(holder as SingleViewHolder, item.notification)
+            is NotificationItem.GroupChild -> bindSingle(holder as SingleViewHolder, item.notification)
+            is NotificationItem.GroupHeader -> bindGroup(holder as GroupViewHolder, item)
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+    private fun bindSingle(holder: SingleViewHolder, notification: PaperNotification) {
+        val b = holder.binding
+        b.notifApp.text = notification.appLabel
+        b.notifTitle.text = notification.title
+        b.notifText.text = notification.text
+
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        b.notifTime.text = timeFormat.format(Date(notification.timestamp))
+
+        val grayscale = ColorMatrixColorFilter(ColorMatrix().also { it.setSaturation(0f) })
+        val customIcon = getCustomIcon(notification.packageName)
+        if (customIcon != null) {
+            b.notifIcon.setImageResource(customIcon)
+        } else {
+            try {
+                b.notifIcon.setImageDrawable(
+                    b.root.context.packageManager.getApplicationIcon(notification.packageName)
+                )
+            } catch (e: PackageManager.NameNotFoundException) {
+                b.notifIcon.setImageDrawable(null)
+            }
+        }
+        b.notifIcon.colorFilter = grayscale
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<PaperNotification>() {
-        override fun areItemsTheSame(old: PaperNotification, new: PaperNotification) =
-            old.id == new.id && old.packageName == new.packageName
-        override fun areContentsTheSame(old: PaperNotification, new: PaperNotification) =
-            old == new
+    private fun bindGroup(holder: GroupViewHolder, group: NotificationItem.GroupHeader) {
+        val b = holder.binding
+        val latest = group.notifications.first()
+
+        b.groupApp.text = group.appLabel
+        b.groupTitle.text = latest.title
+        b.groupSummary.text = if (group.isExpanded) {
+            "tap to collapse"
+        } else {
+            "and ${group.notifications.size - 1} more"
+        }
+
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        b.groupTime.text = timeFormat.format(Date(latest.timestamp))
+
+        val grayscale = ColorMatrixColorFilter(ColorMatrix().also { it.setSaturation(0f) })
+        val customIcon = getCustomIcon(group.packageName)
+        if (customIcon != null) {
+            b.groupIcon.setImageResource(customIcon)
+        } else {
+            try {
+                b.groupIcon.setImageDrawable(
+                    b.root.context.packageManager.getApplicationIcon(group.packageName)
+                )
+            } catch (e: PackageManager.NameNotFoundException) {
+                b.groupIcon.setImageDrawable(null)
+            }
+        }
+        b.groupIcon.colorFilter = grayscale
+
+        b.root.setOnClickListener { onGroupToggle(group.groupKey) }
+    }
+
+    private fun getCustomIcon(packageName: String): Int? = when (packageName) {
+        "com.google.android.dialer",
+        "com.android.dialer",
+        "com.android.phone" -> R.drawable.ic_custom_phone
+
+        "com.google.android.apps.messaging",
+        "com.android.mms" -> R.drawable.ic_custom_messages
+
+        "com.google.android.gm",
+        "com.android.email" -> R.drawable.ic_custom_gmail
+
+        else -> null
+    }
+
+    class DiffCallback : DiffUtil.ItemCallback<NotificationItem>() {
+        override fun areItemsTheSame(old: NotificationItem, new: NotificationItem): Boolean {
+            return when {
+                old is NotificationItem.Single && new is NotificationItem.Single ->
+                    old.notification.packageName == new.notification.packageName &&
+                            old.notification.id == new.notification.id
+                old is NotificationItem.GroupHeader && new is NotificationItem.GroupHeader ->
+                    old.groupKey == new.groupKey
+                old is NotificationItem.GroupChild && new is NotificationItem.GroupChild ->
+                    old.groupKey == new.groupKey &&
+                            old.notification.packageName == new.notification.packageName &&
+                            old.notification.id == new.notification.id
+                else -> false
+            }
+        }
+
+        override fun areContentsTheSame(old: NotificationItem, new: NotificationItem) = old == new
     }
 }
