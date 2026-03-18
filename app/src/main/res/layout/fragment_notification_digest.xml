@@ -38,6 +38,7 @@
             android:visibility="gone">
 
             <TextView
+                android:id="@+id/tier1Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Important"
@@ -63,6 +64,7 @@
             android:visibility="gone">
 
             <TextView
+                android:id="@+id/tier2Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Updates"
@@ -88,6 +90,7 @@
             android:visibility="gone">
 
             <TextView
+                android:id="@+id/tier3Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="More"

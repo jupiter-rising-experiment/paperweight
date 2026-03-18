@@ -98,6 +98,10 @@ class NotificationDigestFragment : Fragment() {
         tier2Adapter.submitList(buildDisplayList(currentTier2))
         tier3Adapter.submitList(buildDisplayList(currentTier3))
 
+        binding.tier1Header.text = "Important (${currentTier1.size})"
+        binding.tier2Header.text = "Updates (${currentTier2.size})"
+        binding.tier3Header.text = "More (${currentTier3.size})"
+
         binding.tier1Section.visibility = if (currentTier1.isEmpty()) View.GONE else View.VISIBLE
         binding.tier2Section.visibility = if (currentTier2.isEmpty()) View.GONE else View.VISIBLE
         binding.tier3Section.visibility = if (currentTier3.isEmpty()) View.GONE else View.VISIBLE
