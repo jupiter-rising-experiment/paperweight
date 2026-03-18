@@ -39,9 +39,17 @@ class NotificationAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_GROUP -> GroupViewHolder(
-                ItemNotificationGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            )
+            VIEW_GROUP -> {
+                val binding = ItemNotificationGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val holder = GroupViewHolder(binding)
+                binding.root.setOnClickListener {
+                    val pos = holder.bindingAdapterPosition
+                    if (pos != RecyclerView.NO_POSITION) {
+                        (getItem(pos) as? NotificationItem.GroupHeader)?.let { onGroupToggle(it.groupKey) }
+                    }
+                }
+                holder
+            }
             else -> SingleViewHolder(
                 ItemNotificationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
@@ -90,7 +98,7 @@ class NotificationAdapter(
         b.groupSummary.text = if (group.isExpanded) {
             "tap to collapse"
         } else {
-            "and ${group.notifications.size - 1} more"
+            "(${group.notifications.size - 1} more)"
         }
 
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -110,8 +118,6 @@ class NotificationAdapter(
             }
         }
         b.groupIcon.colorFilter = grayscale
-
-        b.root.setOnClickListener { onGroupToggle(group.groupKey) }
     }
 
     private fun getCustomIcon(packageName: String): Int? = when (packageName) {

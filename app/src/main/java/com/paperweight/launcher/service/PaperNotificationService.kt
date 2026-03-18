@@ -89,10 +89,10 @@ private fun dummyNotifications(): List<PaperNotification> {
     val now = System.currentTimeMillis()
     val min = 60_000L
     return listOf(
-        // Tier 1 — calls (should group by package+title)
-        PaperNotification(1001, "com.google.android.dialer", "Phone", "Missed call", "Mom", NotificationTier.TIER_1, now - 2 * min),
-        PaperNotification(1002, "com.google.android.dialer", "Phone", "Missed call", "Dad", NotificationTier.TIER_1, now - 5 * min),
-        PaperNotification(1003, "com.google.android.dialer", "Phone", "Missed call", "Work", NotificationTier.TIER_1, now - 8 * min),
+        // Tier 1 — calls: Mom called twice (groups), Dad called once (single)
+        PaperNotification(1001, "com.google.android.dialer", "Phone", "Mom", "Missed call", NotificationTier.TIER_1, now - 2 * min),
+        PaperNotification(1002, "com.google.android.dialer", "Phone", "Mom", "Missed call", NotificationTier.TIER_1, now - 5 * min),
+        PaperNotification(1003, "com.google.android.dialer", "Phone", "Dad", "Missed call", NotificationTier.TIER_1, now - 8 * min),
 
         // Tier 2 — messages (group by package+title = per-sender thread)
         PaperNotification(2001, "com.google.android.apps.messaging", "Messages", "Alice", "Are you free tonight?", NotificationTier.TIER_2, now - 1 * min),
