@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 class PaperNotificationService : NotificationListenerService() {
 
     companion object {
-        private val _notifications = MutableStateFlow<List<PaperNotification>>(emptyList())
+        private val _notifications = MutableStateFlow<List<PaperNotification>>(dummyNotifications())
         val notifications: StateFlow<List<PaperNotification>> = _notifications
 
         val tierOverrides = mutableMapOf<String, NotificationTier>()
@@ -27,47 +27,6 @@ class PaperNotificationService : NotificationListenerService() {
             "com.android.phone",
             "com.google.android.dialer"
         )
-        fun seedDummyData() {
-            _notifications.value = listOf(
-                PaperNotification(
-                    id = 1,
-                    packageName = "com.android.dialer",
-                    appLabel = "Phone",
-                    title = "Missed call",
-                    text = "Mom",
-                    tier = NotificationTier.TIER_1,
-                    timestamp = System.currentTimeMillis() - 5 * 60 * 1000
-                ),
-                PaperNotification(
-                    id = 2,
-                    packageName = "com.google.android.apps.messaging",
-                    appLabel = "Messages",
-                    title = "Sarah",
-                    text = "Are you coming tonight?",
-                    tier = NotificationTier.TIER_2,
-                    timestamp = System.currentTimeMillis() - 20 * 60 * 1000
-                ),
-                PaperNotification(
-                    id = 3,
-                    packageName = "com.google.android.gm",
-                    appLabel = "Gmail",
-                    title = "Your receipt from Apple",
-                    text = "Amount charged: \$0.99",
-                    tier = NotificationTier.TIER_2,
-                    timestamp = System.currentTimeMillis() - 60 * 60 * 1000
-                ),
-                PaperNotification(
-                    id = 4,
-                    packageName = "com.instagram.android",
-                    appLabel = "Instagram",
-                    title = "New followers",
-                    text = "john_doe and 3 others started following you",
-                    tier = NotificationTier.TIER_3,
-                    timestamp = System.currentTimeMillis() - 2 * 60 * 60 * 1000
-                )
-            )
-        }
-
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
@@ -124,4 +83,32 @@ class PaperNotificationService : NotificationListenerService() {
             packageName
         }
     }
+}
+
+private fun dummyNotifications(): List<PaperNotification> {
+    val now = System.currentTimeMillis()
+    val min = 60_000L
+    return listOf(
+        // Tier 1 — calls (groups by package+title)
+        // Tier 1 — calls: Mom called twice (groups), Dad called once (single)
+        PaperNotification(1001, "com.google.android.dialer", "Phone", "Mom", "Missed call", NotificationTier.TIER_1, now - 2 * min),
+        PaperNotification(1002, "com.google.android.dialer", "Phone", "Mom", "Missed call", NotificationTier.TIER_1, now - 5 * min),
+        PaperNotification(1003, "com.google.android.dialer", "Phone", "Dad", "Missed call", NotificationTier.TIER_1, now - 8 * min),
+
+        // Tier 2 — messages (groups per sender thread)
+        PaperNotification(2001, "com.google.android.apps.messaging", "Messages", "Alice", "Are you free tonight?", NotificationTier.TIER_2, now - 1 * min),
+        PaperNotification(2002, "com.google.android.apps.messaging", "Messages", "Alice", "I was thinking dinner", NotificationTier.TIER_2, now - 3 * min),
+        PaperNotification(2003, "com.google.android.apps.messaging", "Messages", "Bob", "Can you send me the doc?", NotificationTier.TIER_2, now - 10 * min),
+
+        // Tier 2 — email (groups by package)
+        PaperNotification(2004, "com.google.android.gm", "Gmail", "New invoice from Stripe", "Your payout of \$240.00 is on its way", NotificationTier.TIER_2, now - 15 * min),
+        PaperNotification(2005, "com.google.android.gm", "Gmail", "GitHub: new PR review", "Someone reviewed your pull request", NotificationTier.TIER_2, now - 20 * min),
+        PaperNotification(2006, "com.google.android.gm", "Gmail", "Meeting reminder", "Standup in 10 minutes", NotificationTier.TIER_2, now - 25 * min),
+
+        // Tier 3 — social (groups by package)
+        PaperNotification(3001, "com.instagram.android", "Instagram", "New follower", "john_doe started following you", NotificationTier.TIER_3, now - 30 * min),
+        PaperNotification(3002, "com.instagram.android", "Instagram", "New follower", "jane_smith started following you", NotificationTier.TIER_3, now - 35 * min),
+        PaperNotification(3003, "com.twitter.android", "X (Twitter)", "New mention", "@someuser mentioned you in a reply", NotificationTier.TIER_3, now - 40 * min),
+        PaperNotification(3004, "com.reddit.frontpage", "Reddit", "Hot post in r/android", "Check out this new launcher concept", NotificationTier.TIER_3, now - 45 * min)
+    )
 }
