@@ -75,7 +75,7 @@ class NotificationAdapter(
         b.notifTime.text = timeFormat.format(Date(notification.timestamp))
 
         val grayscale = ColorMatrixColorFilter(ColorMatrix().also { it.setSaturation(0f) })
-        val customIcon = getCustomIcon(notification.packageName)
+        val customIcon = getCustomIcon(notification.packageName, notification.text)
         if (customIcon != null) {
             b.notifIcon.setImageResource(customIcon)
         } else {
@@ -106,7 +106,7 @@ class NotificationAdapter(
         b.groupTime.text = timeFormat.format(Date(latest.timestamp))
 
         val grayscale = ColorMatrixColorFilter(ColorMatrix().also { it.setSaturation(0f) })
-        val customIcon = getCustomIcon(group.packageName)
+        val customIcon = getCustomIcon(group.packageName, group.notifications.first().text)
         if (customIcon != null) {
             b.groupIcon.setImageResource(customIcon)
         } else {
@@ -123,18 +123,25 @@ class NotificationAdapter(
 
     }
 
-    private fun getCustomIcon(packageName: String): Int? = when (packageName) {
-        "com.google.android.dialer",
-        "com.android.dialer",
-        "com.android.phone" -> R.drawable.ic_custom_phone
+    private fun getCustomIcon(packageName: String, text: String? = null): Int? {
+        val isDialer = packageName in setOf(
+            "com.google.android.dialer",
+            "com.android.dialer",
+            "com.android.phone"
+        )
+        if (isDialer) {
+            return if (text == "Missed call") R.drawable.ic_custom_missed_call
+            else R.drawable.ic_custom_phone
+        }
+        return when (packageName) {
+            "com.google.android.apps.messaging",
+            "com.android.mms" -> R.drawable.ic_custom_messages
 
-        "com.google.android.apps.messaging",
-        "com.android.mms" -> R.drawable.ic_custom_messages
+            "com.google.android.gm",
+            "com.android.email" -> R.drawable.ic_custom_gmail
 
-        "com.google.android.gm",
-        "com.android.email" -> R.drawable.ic_custom_gmail
-
-        else -> null
+            else -> null
+        }
     }
 
     class DiffCallback : DiffUtil.ItemCallback<NotificationItem>() {
