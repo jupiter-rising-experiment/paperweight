@@ -127,6 +127,7 @@ class NotificationDigestFragment : Fragment() {
                 if (header.isExpanded) {
                     notifs.forEachIndexed { index, notif ->
                         result.add(NotificationItem.GroupChild(notif, key, isFirst = index == 0))
+                    }
                 }
             }
         }

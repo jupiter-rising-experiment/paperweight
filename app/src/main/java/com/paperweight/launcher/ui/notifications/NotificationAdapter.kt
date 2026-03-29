@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -56,11 +57,10 @@ class NotificationAdapter(
         }
     }
 
-
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is NotificationItem.Single -> bindSingle(holder as SingleViewHolder, item.notification)
-            is NotificationItem.GroupChild -> bindSingle(holder as SingleViewHolder, item.notification, item.isFirst)
+            is NotificationItem.GroupChild -> bindSingle(holder as SingleViewHolder, item.notification, false)
             is NotificationItem.GroupHeader -> bindGroup(holder as GroupViewHolder, item)
         }
     }
@@ -70,6 +70,8 @@ class NotificationAdapter(
         b.notifIcon.visibility = if (showHeader) View.VISIBLE else View.INVISIBLE
         b.notifApp.visibility = if (showHeader) View.VISIBLE else View.INVISIBLE
         b.notifApp.text = notification.appLabel
+        b.notifTitle.text = notification.title
+        b.notifText.text = notification.text
 
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         b.notifTime.text = timeFormat.format(Date(notification.timestamp))
@@ -99,10 +101,8 @@ class NotificationAdapter(
         b.groupSummary.text = if (group.isExpanded) {
             "tap to collapse"
         } else {
-            "${latest.text}  ·  (${group.notifications.size - 1 } more)"
-
+            "${latest.text}  ·  ${group.notifications.size - 1} more"
         }
-
 
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         b.groupTime.text = timeFormat.format(Date(latest.timestamp))
@@ -121,8 +121,6 @@ class NotificationAdapter(
             }
         }
         b.groupIcon.colorFilter = grayscale
-
-
     }
 
     private fun getCustomIcon(packageName: String, text: String? = null): Int? {
