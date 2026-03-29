@@ -60,16 +60,16 @@ class NotificationAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is NotificationItem.Single -> bindSingle(holder as SingleViewHolder, item.notification)
-            is NotificationItem.GroupChild -> bindSingle(holder as SingleViewHolder, item.notification)
+            is NotificationItem.GroupChild -> bindSingle(holder as SingleViewHolder, item.notification, item.isFirst)
             is NotificationItem.GroupHeader -> bindGroup(holder as GroupViewHolder, item)
         }
     }
 
-    private fun bindSingle(holder: SingleViewHolder, notification: PaperNotification) {
+    private fun bindSingle(holder: SingleViewHolder, notification: PaperNotification, showHeader: Boolean = true) {
         val b = holder.binding
+        b.notifIcon.visibility = if (showHeader) View.VISIBLE else View.INVISIBLE
+        b.notifApp.visibility = if (showHeader) View.VISIBLE else View.INVISIBLE
         b.notifApp.text = notification.appLabel
-        b.notifTitle.text = notification.title
-        b.notifText.text = notification.text
 
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         b.notifTime.text = timeFormat.format(Date(notification.timestamp))
@@ -99,8 +99,10 @@ class NotificationAdapter(
         b.groupSummary.text = if (group.isExpanded) {
             "tap to collapse"
         } else {
-            "(${group.notifications.size - 1} more)"
+            "${latest.text}  ·  (${group.notifications.size - 1 } more)"
+
         }
+
 
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         b.groupTime.text = timeFormat.format(Date(latest.timestamp))

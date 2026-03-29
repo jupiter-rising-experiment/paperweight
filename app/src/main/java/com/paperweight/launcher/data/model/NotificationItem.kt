@@ -11,6 +11,7 @@ sealed class NotificationItem {
     ) : NotificationItem()
     data class GroupChild(
         val notification: PaperNotification,
-        val groupKey: String
+        val groupKey: String,
+        val isFirst: Boolean = false
     ) : NotificationItem()
 }
