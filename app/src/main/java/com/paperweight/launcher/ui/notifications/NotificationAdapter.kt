@@ -99,7 +99,7 @@ class NotificationAdapter(
         b.groupSummary.text = if (group.isExpanded) {
             "tap to collapse"
         } else {
-            "(${group.notifications.size} more)"
+            latest.text
         }
 
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
