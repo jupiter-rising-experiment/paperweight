@@ -60,18 +60,18 @@ class NotificationAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is NotificationItem.Single -> bindSingle(holder as SingleViewHolder, item.notification)
-            is NotificationItem.GroupChild -> bindSingle(holder as SingleViewHolder, item.notification, false)
+            is NotificationItem.GroupChild -> bindSingle(holder as SingleViewHolder, item.notification, showHeader = false, showDivider = item.isLast, showTitle = item.showTitle)
             is NotificationItem.GroupHeader -> bindGroup(holder as GroupViewHolder, item)
         }
     }
 
-    private fun bindSingle(holder: SingleViewHolder, notification: PaperNotification, showHeader: Boolean = true) {
+    private fun bindSingle(holder: SingleViewHolder, notification: PaperNotification, showHeader: Boolean = true, showDivider: Boolean = true, showTitle: Boolean = true) {
         val b = holder.binding
         b.notifIcon.visibility = if (showHeader) View.VISIBLE else View.INVISIBLE
         b.notifApp.visibility = if (showHeader) View.VISIBLE else View.INVISIBLE
+        b.notifTitle.visibility = if (showTitle) View.VISIBLE else View.GONE
+        b.notifDivider.visibility = if (showDivider) View.VISIBLE else View.GONE
         b.notifApp.text = notification.appLabel
-        b.notifTitle.text = notification.title
-        b.notifText.text = notification.text
 
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         b.notifTime.text = timeFormat.format(Date(notification.timestamp))
@@ -121,6 +121,7 @@ class NotificationAdapter(
             }
         }
         b.groupIcon.colorFilter = grayscale
+        b.groupDivider.visibility = if (group.isExpanded) View.GONE else View.VISIBLE
     }
 
     private fun getCustomIcon(packageName: String, text: String? = null): Int? {

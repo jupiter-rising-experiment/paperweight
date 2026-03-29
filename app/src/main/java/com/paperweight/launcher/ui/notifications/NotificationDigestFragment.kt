@@ -125,8 +125,16 @@ class NotificationDigestFragment : Fragment() {
                 )
                 result.add(header)
                 if (header.isExpanded) {
+                    val isMessagingOrCall = notifs.first().packageName in MESSAGING_PACKAGES ||
+                            notifs.first().packageName in CALL_PACKAGES
                     notifs.forEachIndexed { index, notif ->
-                        result.add(NotificationItem.GroupChild(notif, key, isFirst = index == 0))
+                        result.add(NotificationItem.GroupChild(
+                            notification = notif,
+                            groupKey = key,
+                            isFirst = index == 0,
+                            isLast = index == notifs.size - 1,
+                            showTitle = !isMessagingOrCall
+                        ))
                     }
                 }
             }
